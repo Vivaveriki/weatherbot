@@ -10,8 +10,30 @@
 
 module.exports = (robot) ->
 
-  # robot.hear /badger/i, (res) ->
-  #   res.send "Badgers? BADGERS? WE DON'T NEED NO STINKIN BADGERS"
+   robot.hear /weather/i, (reply) ->
+        robot.http("http://api.openweathermap.org/data/2.5/weather?q=Boston,us&appid=ecb5e3624830a0794e781958743e9524")
+            .get() (err, res, body) ->
+                data = JSON.parse body
+                name = data.name
+                temp = Math.floor(data.main.temp * (9 / 5) - 459.67)
+                reply.send "Here is the weather in #{name}? Current temp is #{temp} degrees!"
+                
+    robot.respond /what should I wear today/i, (respond) ->
+        robot.http("http://api.openweathermap.org/data/2.5/weather?q=Boston,us&appid=ecb5e3624830a0794e781958743e9524")
+            .get() (err, res, body) ->
+                data = JSON.parse body
+                temp = Math.floor(data.main.temp * (9 / 5) - 459.67)
+                if temp >= 65
+                    respond.reply "You better wear some sunscreen!"  
+                else
+                    respond.reply "BRRRRRRRRR, wear a jacket or two!"
+            
+    robot.hear /Hello/i, (res) ->
+        res.send "Well hello there, good lookin'."
+        
+    robot.hear /Bye/i, (res) ->
+        res.send "Tootles!"
+    
   #
   # robot.respond /open the (.*) doors/i, (res) ->
   #   doorType = res.match[1]
@@ -100,7 +122,4 @@ module.exports = (robot) ->
   #     res.reply 'Sure!'
   #
   #     robot.brain.set 'totalSodas', sodasHad+1
-  #
-  # robot.respond /sleep it off/i, (res) ->
-  #   robot.brain.set 'totalSodas', 0
-  #   res.reply 'zzzzz'
+ 
